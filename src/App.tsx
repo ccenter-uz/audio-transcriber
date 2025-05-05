@@ -15,7 +15,6 @@ import Layout from "@/widgets/Layout";
 import LoginPage from "@/pages/LoginPage";
 import RootPage from "@/pages/RootPage";
 import DashboardPage from "@/pages/DashboardPage";
-import AccountPage from "@/pages/AccountPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import TranscriptEditorPage from "@/pages/TranscriptPage/TranscriptEditorPage";
 import UserDetailsPage from "@/pages/DashboardPage/UserDetailsPage";
@@ -99,16 +98,6 @@ function App() {
                     <TranscriptEditorPage />
                   </RequireAuth>
                 } />
-
-                {/* Both roles can access */}
-                <Route
-                  path="/account"
-                  element={
-                    <RequireAuth>
-                      <AccountPage />
-                    </RequireAuth>
-                  }
-                />
 
                 {/* 404 page for authenticated users */}
                 <Route path="*" element={<NotFoundPage />} />
