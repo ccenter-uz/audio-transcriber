@@ -1,0 +1,17 @@
+{
+  "files": [],
+  "compilerOptions": {
+    "strict": true,
+    "jsx": "react",
+    "module": "esnext",
+    "target": "esnext",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "types": ["vitest/globals"],
+  },
+  "references": [
+    { "path": "./tsconfig.app.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
