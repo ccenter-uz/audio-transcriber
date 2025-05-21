@@ -27,7 +27,7 @@ const STATUS_LABELS = {
 };
 
 export default function TranscriptionEditor() {
-  const [currentChunk, setCurrentChunk] = useState(0);
+  const [currentChunk, setCurrentChunk] = useState(1);
   const [transcription, setTranscription] = useState("");
   const [isFinished, setIsFinished] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -294,10 +294,10 @@ export default function TranscriptionEditor() {
             }>
             {STATUS_LABELS[
               chunks[currentChunk - 1]?.status as keyof typeof STATUS_LABELS
-            ].toUpperCase()}
+            ]?.toUpperCase()}
           </Tag>
         </Title>
-
+        
         <TextArea
           className="shadow-lg p-4 text-lg resize-none"
           placeholder="Tinglagan so'zni yozing..."
