@@ -9,7 +9,7 @@ import {
   CheckCircleOutlined,
 } from "@ant-design/icons";
 import { useAudioSegments } from "@/features/transcripts/hooks/useAudioSegments";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { type AudioSegment } from "@/features/transcripts/api/transcriptApi";
 import { transcriptApi } from "@/features/transcripts/api/transcriptApi";
 import "react-h5-audio-player/lib/styles.css";
@@ -37,7 +37,6 @@ export default function TranscriptionEditor() {
   const [showFinishModal, setShowFinishModal] = useState(false);
   const playerRef = useRef<AudioPlayer>(null);
   const chunkListRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   const { user } = useAuth(); // Assuming you have a useAuth hook to get user info
 
   const { data, isLoading, error, refetch } = useAudioSegments(user?.id);
@@ -71,17 +70,8 @@ export default function TranscriptionEditor() {
       localStorage.removeItem("audio_id");
       localStorage.removeItem(CURRENT_CHUNK_KEY);
 
-      // Get next transcript assignment
-      const nextTranscript = await transcriptApi.assignNextTranscript();
-
-      if (nextTranscript) {
-        // If there's a next transcript, redirect to root to start fresh
-        navigate("/");
-      } else {
-        // If no more transcripts, show message and redirect
-        message.success("Barcha transkriptlar yakunlandi!");
-        navigate("/");
-      }
+      // Reload the page to reflect changes
+      window.location.reload();
     } catch (err) {
       console.error("Failed to finish transcription process:", err);
       message.error("Transkriptsiya jarayonini yakunlashda xatolik yuz berdi");
@@ -276,6 +266,34 @@ export default function TranscriptionEditor() {
     }
   }, [chunks]);
 
+  // Open the ready status chunk as default when all chunks are done open the last chunk
+  useEffect(() => {
+    
+    if (chunks.length > 0) {
+      const readyChunk = chunks.findIndex(
+        (chunk: { status: string }) => chunk.status === "ready"
+      );
+
+      const isAllDone = chunks.every(
+        (chunk: { status: string }) => chunk.status === "done"
+      );
+
+      if (readyChunk !== -1) {
+        setCurrentChunk(readyChunk + 1);
+        setStartIndex(Math.floor(readyChunk / VISIBLE_CHUNKS) * VISIBLE_CHUNKS);
+      } else if (isAllDone) {
+        // If all chunks are done, set to the last chunk
+        setCurrentChunk(chunks.length);
+        setStartIndex(Math.floor((chunks.length - 1) / VISIBLE_CHUNKS) * VISIBLE_CHUNKS);
+      } else {
+        // If no ready chunk, set to the first chunk
+        setCurrentChunk(1);
+        setStartIndex(0);
+      }
+    }
+
+  }, [chunks]);
+
   return (
     <div className="mt-[-120px] flex flex-col min-h-screen justify-between bg-gray-50">
       {/* Centered Input */}
@@ -297,7 +315,7 @@ export default function TranscriptionEditor() {
             ]?.toUpperCase()}
           </Tag>
         </Title>
-        
+
         <TextArea
           className="shadow-lg p-4 text-lg resize-none"
           placeholder="Tinglagan so'zni yozing..."
