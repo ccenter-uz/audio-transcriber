@@ -71,7 +71,7 @@ export default function TranscriptionEditor() {
       localStorage.removeItem(CURRENT_CHUNK_KEY);
 
       // Reload the page to reflect changes
-      window.location.reload();
+      refetch();
     } catch (err) {
       console.error("Failed to finish transcription process:", err);
       message.error("Transkriptsiya jarayonini yakunlashda xatolik yuz berdi");
@@ -454,7 +454,6 @@ export default function TranscriptionEditor() {
       <Modal
         title="Xabar berish"
         open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
         onCancel={() => setIsModalOpen(false)}
         footer={[
           <Button

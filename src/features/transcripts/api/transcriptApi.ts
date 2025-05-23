@@ -51,10 +51,10 @@ export const transcriptApi = {
     return response.data;
   },
 
-  async getAudioSegments(audioId?: string): Promise<AudioSegmentResponse> {
+  async getAudioSegments(userId?: string): Promise<AudioSegmentResponse> {
     let url = '/api/v1/audio_segment';
-    if (audioId) {
-      url += `?user_id=${audioId}`;
+    if (userId) {
+      url += `?user_id=${userId}`;
     }
     const response = await axiosInstance.get<AudioSegmentResponse>(url);
     return response.data;
