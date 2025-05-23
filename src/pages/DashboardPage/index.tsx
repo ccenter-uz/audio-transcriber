@@ -1,34 +1,34 @@
-import { Card, Spin, Table, Typography } from 'antd';
+import { Card, Spin, Typography } from 'antd';
 import { useDashboardStats } from '@/features/transcripts/hooks/useDashboardStats';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
-import dayjs from 'dayjs';
-import type { UserPerformance } from '@/features/transcripts/types';
+// import {
+//   AreaChart,
+//   Area,
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Tooltip,
+//   ResponsiveContainer,
+//   PieChart,
+//   Pie,
+//   Cell,
+// } from 'recharts';
+// import dayjs from 'dayjs';
+// import type { UserPerformance } from '@/features/transcripts/types';
 import { useAuth } from '@/shared/lib/auth.tsx';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 
-const STATUS_COLORS = {
-  reviewed: '#52c41a',
-  in_progress: '#1890ff',
-  error: '#ff4d4f',
-};
+// const STATUS_COLORS = {
+//   reviewed: '#52c41a',
+//   in_progress: '#1890ff',
+//   error: '#ff4d4f',
+// };
 
 const DashboardPage = () => {
   const { user } = useAuth();
   const { data, isLoading, error, isError } = useDashboardStats();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   console.log('Dashboard Data:', { data, isLoading, error, user });
 
@@ -64,54 +64,54 @@ const DashboardPage = () => {
     );
   }
 
-  const userColumns = [
-    {
-      title: 'Name',
-      dataIndex: 'name',
-      key: 'name',
-      render: (name: string, record: UserPerformance) => (
-        <span 
-          className="text-blue-600 cursor-pointer hover:underline"
-          onClick={() => navigate(`/dashboard/${record.id}`)}
-        >
-          {name}
-        </span>
-      ),
-    },
-    {
-      title: 'Reviewed Count',
-      dataIndex: 'reviewedCount',
-      key: 'reviewedCount',
-      sorter: (a: UserPerformance, b: UserPerformance) =>
-        a.reviewedCount - b.reviewedCount,
-    },
-    {
-      title: 'Average Edit Time',
-      dataIndex: 'averageEditTime',
-      key: 'averageEditTime',
-      render: (time: number) => `${time} mins`,
-    },
-    {
-      title: 'Status',
-      dataIndex: 'isActive',
-      key: 'isActive',
-      render: (active: boolean) => (
-        <span
-          className={`px-2 py-1 rounded-full text-sm ${
-            active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-          }`}
-        >
-          {active ? 'Active' : 'Inactive'}
-        </span>
-      ),
-    },
-    {
-      title: 'Joined',
-      dataIndex: 'joinedAt',
-      key: 'joinedAt',
-      render: (date: string) => dayjs(date).format('MMM D, YYYY'),
-    },
-  ];
+  // const userColumns = [
+  //   {
+  //     title: 'Name',
+  //     dataIndex: 'name',
+  //     key: 'name',
+  //     render: (name: string, record: UserPerformance) => (
+  //       <span 
+  //         className="text-blue-600 cursor-pointer hover:underline"
+  //         onClick={() => navigate(`/dashboard/${record.id}`)}
+  //       >
+  //         {name}
+  //       </span>
+  //     ),
+  //   },
+  //   {
+  //     title: 'Reviewed Count',
+  //     dataIndex: 'reviewedCount',
+  //     key: 'reviewedCount',
+  //     sorter: (a: UserPerformance, b: UserPerformance) =>
+  //       a.reviewedCount - b.reviewedCount,
+  //   },
+  //   {
+  //     title: 'Average Edit Time',
+  //     dataIndex: 'averageEditTime',
+  //     key: 'averageEditTime',
+  //     render: (time: number) => `${time} mins`,
+  //   },
+  //   {
+  //     title: 'Status',
+  //     dataIndex: 'isActive',
+  //     key: 'isActive',
+  //     render: (active: boolean) => (
+  //       <span
+  //         className={`px-2 py-1 rounded-full text-sm ${
+  //           active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
+  //         }`}
+  //       >
+  //         {active ? 'Active' : 'Inactive'}
+  //       </span>
+  //     ),
+  //   },
+  //   {
+  //     title: 'Joined',
+  //     dataIndex: 'joinedAt',
+  //     key: 'joinedAt',
+  //     render: (date: string) => dayjs(date).format('MMM D, YYYY'),
+  //   },
+  // ];
 
   return (
     <div className="space-y-6">
@@ -121,33 +121,47 @@ const DashboardPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <Card>
           <div className="text-center">
-            <p className="text-gray-600">Total Reviewed</p>
+            <p className="text-gray-600">Total Audio Files</p>
             <p className="text-2xl font-semibold text-blue-600">
-              {data?.totalReviewed}
+              {data?.audioStats?.length || 0}
             </p>
+          </div>
+        </Card>
+        <Card>
+          <div className="text-center">
+            <p className="text-gray-600">Total Segments</p>
+            <p className="text-2xl font-semibold text-green-600">
+              {data?.audioStats?.reduce((sum, file) => sum + file.total_segments, 0) || 0}
+            </p>
+            <p className="text-sm text-gray-500">
+              Across all files
+            </p>
+          </div>
+        </Card>
+        <Card>
+          <div className="text-center">
+            <p className="text-gray-600">Completed Segments</p>
+            <div>
+              <p className="text-2xl font-semibold text-purple-600">
+                {data?.audioStats?.reduce((sum, file) => sum + file.completed_segments, 0) || 0}
+              </p>
+              <p className="text-sm text-gray-500">
+                {Math.round(
+                  (data?.audioStats?.reduce((sum, file) => sum + file.completed_segments, 0) || 0) /
+                  (data?.audioStats?.reduce((sum, file) => sum + file.total_segments, 0) || 1) * 100
+                )}% Complete
+              </p>
+            </div>
           </div>
         </Card>
         <Card>
           <div className="text-center">
             <p className="text-gray-600">In Progress</p>
-            <p className="text-2xl font-semibold text-green-600">
-              {data?.inProgress}
+            <p className="text-2xl font-semibold text-orange-500">
+              {data?.audioStats?.filter(file => file.percent > 0 && file.percent < 100).length || 0}
             </p>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <p className="text-gray-600">Errored Files</p>
-            <p className="text-2xl font-semibold text-red-600">
-              {data?.erroredFiles}
-            </p>
-          </div>
-        </Card>
-        <Card>
-          <div className="text-center">
-            <p className="text-gray-600">Active Transcribers</p>
-            <p className="text-2xl font-semibold text-purple-600">
-              {data?.activeTranscribers}
+            <p className="text-sm text-gray-500">
+              Files being processed
             </p>
           </div>
         </Card>
@@ -156,7 +170,7 @@ const DashboardPage = () => {
       {/* Charts Row */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Trend Chart */}
-        <Card className="lg:col-span-2">
+        {/* <Card className="lg:col-span-2">
           <Title level={4}>7-Day Trend</Title>
           <div className="h-[300px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -200,10 +214,10 @@ const DashboardPage = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </Card> */}
 
         {/* Pie Chart */}
-        <Card>
+        {/* <Card>
           <Title level={4}>Status Distribution</Title>
           <div className="h-[300px] mt-4">
             <ResponsiveContainer width="100%" height="100%">
@@ -231,11 +245,11 @@ const DashboardPage = () => {
               </PieChart>
             </ResponsiveContainer>
           </div>
-        </Card>
+        </Card> */}
       </div>
 
       {/* User Performance Table */}
-      <Card>
+      {/* <Card>
         <Title level={4}>User Performance</Title>
         <Table
           dataSource={data?.userPerformance}
@@ -244,7 +258,7 @@ const DashboardPage = () => {
           className="mt-4"
           pagination={{ pageSize: 5 }}
         />
-      </Card>
+      </Card> */}
     </div>
   );
 };

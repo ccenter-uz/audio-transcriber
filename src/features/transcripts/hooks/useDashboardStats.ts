@@ -1,6 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { fetchDashboardStats } from '../api/dashboardApi';
-import { DashboardStats } from '../types';
+import { AudioFileStats } from '../types';
+
+
+interface DashboardStats {
+  audioStats: AudioFileStats[];
+}
 
 export const useDashboardStats = () => {
   return useQuery<DashboardStats>({

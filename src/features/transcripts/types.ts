@@ -9,24 +9,6 @@ export interface UserPerformance {
   joinedAt: string;
 }
 
-export interface DashboardStats {
-  totalReviewed: number;
-  inProgress: number;
-  erroredFiles: number;
-  activeTranscribers: number;
-  statusDistribution: {
-    status: TranscriptionStatus;
-    count: number;
-  }[];
-  dailyStats: {
-    date: string;
-    reviewed: number;
-    inProgress: number;
-    error: number;
-  }[];
-  userPerformance: UserPerformance[];
-}
-
 export interface TranscriptProgress {
   id: string;
   name: string;
@@ -59,4 +41,12 @@ export interface UserDashboardStats {
   total_minutes: number;
   weekly_audio_files: number;
   weekly_chunks: number;
+}
+
+export interface AudioFileStats {
+  audio_file_id: number;
+  filename: string;
+  total_segments: number;
+  completed_segments: number;
+  percent: number;
 }
