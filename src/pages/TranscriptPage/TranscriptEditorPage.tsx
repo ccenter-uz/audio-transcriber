@@ -1,6 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from "react";
 import { Button, Tooltip, Input, Modal, message, Typography, Tag } from "antd";
-import AudioPlayer, { RHAP_UI } from "react-h5-audio-player";
 import {
   ArrowRightOutlined,
   NotificationFilled,
@@ -35,7 +34,7 @@ export default function TranscriptionEditor() {
   const [reportText, setReportText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
-  const playerRef = useRef<AudioPlayer>(null);
+  const playerRef = useRef<HTMLAudioElement>(null);
   const chunkListRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth(); // Assuming you have a useAuth hook to get user info
 
@@ -93,8 +92,8 @@ export default function TranscriptionEditor() {
           message.success("Transkript muvaffaqiyatli saqlandi");
           // Only navigate after successful save
           setTranscription("");
-          if (playerRef.current?.audio?.current) {
-            playerRef.current.audio.current.currentTime = 0;
+          if (playerRef.current) {
+            playerRef.current.currentTime = 0;
           }
         } catch (err) {
           console.error("Failed to save transcript:", err);
@@ -107,8 +106,8 @@ export default function TranscriptionEditor() {
         // If no transcription, just navigate
         handleScrollDown();
         setTranscription("");
-        if (playerRef.current?.audio?.current) {
-          playerRef.current.audio.current.currentTime = 0;
+        if (playerRef.current) {
+          playerRef.current.currentTime = 0;
         }
       }
     } else {
@@ -123,8 +122,8 @@ export default function TranscriptionEditor() {
     // Reset states - they will be updated by the useEffect
     setTranscription("");
     setReportText("");
-    if (playerRef.current?.audio?.current) {
-      playerRef.current.audio.current.currentTime = 0;
+    if (playerRef.current) {
+      playerRef.current.currentTime = 0;
     }
   };
 
@@ -137,8 +136,8 @@ export default function TranscriptionEditor() {
         setStartIndex(Math.min(chunks.length - VISIBLE_CHUNKS, startIndex + 1));
       }
       setTranscription("");
-      if (playerRef.current?.audio?.current) {
-        playerRef.current.audio.current.currentTime = 0;
+      if (playerRef.current) {
+        playerRef.current.currentTime = 0;
       }
     }
   };
@@ -152,8 +151,8 @@ export default function TranscriptionEditor() {
         setStartIndex(Math.max(0, startIndex - 1));
       }
       setTranscription("");
-      if (playerRef.current?.audio?.current) {
-        playerRef.current.audio.current.currentTime = 0;
+      if (playerRef.current) {
+        playerRef.current.currentTime = 0;
       }
     }
   };
@@ -377,26 +376,22 @@ export default function TranscriptionEditor() {
             Xabar berish
           </Button>
 
-          <div className="flex w-[50%] justify-center">
-            <AudioPlayer
+            <div className="flex w-[50%] justify-center">
+            <audio
               ref={playerRef}
               src={chunks[currentChunk - 1]?.file_path}
-              customControlsSection={[
-                RHAP_UI.MAIN_CONTROLS,
-                RHAP_UI.ADDITIONAL_CONTROLS,
-                RHAP_UI.VOLUME_CONTROLS,
-              ]}
-              autoPlayAfterSrcChange={true}
-              showJumpControls={false}
+              controls
+              autoPlay
+              className="w-full"
+              controlsList="nodownload"
               style={{
-                backgroundColor: "transparent",
-                boxShadow: "none",
-                width: "100%",
-                borderRadius: "1rem",
+              borderRadius: "1rem",
+              backgroundColor: "transparent",
               }}
-              progressJumpSteps={{ backward: 5000, forward: 5000 }}
-            />
-          </div>
+            >
+              Your browser does not support the audio element.
+            </audio>
+            </div>
 
           <Button
             type="primary"
