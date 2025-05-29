@@ -40,6 +40,33 @@ export interface TranscriptUpdate {
   transcribe_text?: string | null;
 }
 
+export interface DatasetViewerItem {
+  audio_id: number;
+  audio_url: string;
+  chunk_id: number;
+  chunk_url: string;
+  duration: number;
+  previous_text: string;
+  text: string;
+  next_text: string;
+  sentence: string;
+  report_text: string;
+  transcriber: string;
+  transcriber_id: string;
+}
+
+export interface DatasetViewerResponse {
+  data: DatasetViewerItem[];
+  total: number;
+}
+
+export interface DatasetViewerParams {
+  user_id?: string;
+  report?: boolean;
+  offset?: number;
+  limit?: number;
+}
+
 export const transcriptApi = {
   async getActiveTranscript(): Promise<Transcript | null> {
     const response = await axiosInstance.get<Transcript>('/api/v1/transcript/active');
@@ -66,6 +93,19 @@ export const transcriptApi = {
 
   async getTranscript(id: number): Promise<TranscriptDetail> {
     const response = await axiosInstance.get<TranscriptDetail>(`/api/v1/transcript/${id}`);
+    return response.data;
+  },
+
+  async getDatasetViewer(params: DatasetViewerParams): Promise<DatasetViewerResponse> {
+    const queryParams = new URLSearchParams();
+    if (params.user_id) queryParams.append('user_id', params.user_id);
+    if (params.report !== undefined) queryParams.append('report', params.report.toString());
+    if (params.offset !== undefined) queryParams.append('offset', params.offset.toString());
+    if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
+
+    const response = await axiosInstance.get<DatasetViewerResponse>(
+      `/api/v1/dataset_viewer?${queryParams.toString()}`
+    );
     return response.data;
   }
 }

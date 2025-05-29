@@ -2,6 +2,7 @@ import { useAuth } from "@/shared/lib/auth.tsx";
 import {
   DashboardOutlined,
   LogoutOutlined,
+  DatabaseOutlined,
 } from "@ant-design/icons";
 import { Layout as AntLayout, Menu, Avatar, Dropdown } from "antd";
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
@@ -23,7 +24,7 @@ const Layout = () => {
   };
 
   const getMenuItems = () => {
-    return [
+    const menuItems = [
       {
         key: "/dashboard",
         icon: <DashboardOutlined />,
@@ -37,6 +38,17 @@ const Layout = () => {
         ),
       },
     ];
+
+    // Add Dataset Viewer link for admin users
+    if (user?.role === "admin") {
+      menuItems.push({
+        key: "/dataset",
+        icon: <DatabaseOutlined />,
+        label: <Link to="/dataset">Dataset Viewer</Link>,
+      });
+    }
+
+    return menuItems;
   };
 
   const userMenu = [
@@ -55,7 +67,7 @@ const Layout = () => {
             VoiceTranscribe
           </Link>
           <Menu
-            mode="inline"
+            mode="horizontal"
             selectedKeys={[location.pathname]}
             className="border-none"
             items={getMenuItems()}

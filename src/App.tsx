@@ -18,6 +18,7 @@ import DashboardPage from "@/pages/DashboardPage";
 import NotFoundPage from "@/pages/NotFoundPage";
 import TranscriptEditorPage from "@/pages/TranscriptPage/TranscriptEditorPage";
 import UserDetailsPage from "@/pages/DashboardPage/UserDetailsPage";
+import DatasetViewerPage from "@/pages/DashboardPage/DatasetViewerPage";
 
 // Initialize React Query client with global error handling
 const queryClient = new QueryClient({
@@ -88,6 +89,14 @@ function App() {
                   element={
                     <RequireAuth>
                       <UserDetailsPage />
+                    </RequireAuth>
+                  }
+                />
+                <Route
+                  path="/dataset"
+                  element={
+                    <RequireAuth role="admin">
+                      <DatasetViewerPage />
                     </RequireAuth>
                   }
                 />
