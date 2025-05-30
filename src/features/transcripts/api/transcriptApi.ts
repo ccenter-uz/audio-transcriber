@@ -67,6 +67,25 @@ export interface DatasetViewerParams {
   limit?: number;
 }
 
+export interface User {
+  agent_id: string;
+  create_date: string;
+  first_number: string;
+  name: string;
+  service_name: string;
+}
+
+export interface UserListResponse {
+  count: number;
+  users: User[];
+}
+
+export interface UserListParams {
+  name?: string;
+  limit?: number;
+  offset?: number;
+}
+
 export const transcriptApi = {
   async getActiveTranscript(): Promise<Transcript | null> {
     const response = await axiosInstance.get<Transcript>('/api/v1/transcript/active');
@@ -105,6 +124,18 @@ export const transcriptApi = {
 
     const response = await axiosInstance.get<DatasetViewerResponse>(
       `/api/v1/dataset_viewer?${queryParams.toString()}`
+    );
+    return response.data;
+  },
+
+  async getUserList(params: UserListParams): Promise<UserListResponse> {
+    const queryParams = new URLSearchParams();
+    if (params.name) queryParams.append('name', params.name);
+    if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
+    if (params.offset !== undefined) queryParams.append('offset', params.offset.toString());
+
+    const response = await axiosInstance.get<UserListResponse>(
+      `/api/v1/user/list?${queryParams.toString()}`
     );
     return response.data;
   }

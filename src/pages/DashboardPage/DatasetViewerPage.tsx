@@ -1,22 +1,25 @@
 import { useState } from "react";
 import {
   Table,
-  Input,
+  Select,
   Switch,
   Card,
   Typography,
-  Tooltip,
   Space,
   Tag,
+  Button,
 } from "antd";
 import { useDatasetViewer } from "@/features/transcripts/hooks/useDatasetViewer";
+import { useUserList } from "@/features/transcripts/hooks/useUserList";
 import {
   type DatasetViewerItem,
   type DatasetViewerResponse,
 } from "@/features/transcripts/api/transcriptApi";
-import { SearchOutlined, WarningOutlined } from "@ant-design/icons";
+import { WarningOutlined } from "@ant-design/icons";
 import type { TableProps } from "antd";
 import { Link } from "react-router-dom";
+import Modal from "antd/es/modal/Modal";
+import debounce from "lodash/debounce";
 
 const { Title } = Typography;
 
@@ -42,9 +45,17 @@ const AudioPlayer = ({
 
 const DatasetViewerPage = () => {
   const [userId, setUserId] = useState<string>("");
+  const [searchText, setSearchText] = useState<string>("");
   const [showReported, setShowReported] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSentenceModalOpen, setIsSentenceModalOpen] = useState(false);
+  const [selectedSentence, setSelectedSentence] = useState<string>("");
   const pageSize = 10;
+
+  const { data: userData, isLoading: isLoadingUsers } = useUserList({
+    name: searchText,
+    limit: 50,
+  });
 
   const { data, isLoading } = useDatasetViewer({
     user_id: userId || undefined,
@@ -53,13 +64,26 @@ const DatasetViewerPage = () => {
     limit: pageSize,
   }) as { data: DatasetViewerResponse | undefined; isLoading: boolean };
 
+  const debouncedSearch = debounce((value: string) => {
+    setSearchText(value);
+  }, 500);
+
+  const openSentenceModal = (sentence: string) => {
+    setSelectedSentence(sentence);
+    setIsSentenceModalOpen(true);
+  };
+
   const columns: TableProps<DatasetViewerItem>["columns"] = [
     {
       title: "Transcriber",
       key: "transcriber",
       width: 300,
       render: (record: DatasetViewerItem) => (
-        <Link className="text-blue-500" to={`/dashboard/${record.transcriber_id}`}>{record.transcriber}</Link>
+        <Link
+          className="text-blue-500"
+          to={`/dashboard/${record.transcriber_id}`}>
+          {record.transcriber}
+        </Link>
       ),
     },
     {
@@ -104,11 +128,9 @@ const DatasetViewerPage = () => {
       title: "Full Sentence",
       dataIndex: "sentence",
       key: "sentence",
-      ellipsis: { showTitle: false },
+      width: 200,
       render: (sentence: string) => (
-        <Tooltip placement="topLeft" title={sentence}>
-          {sentence}
-        </Tooltip>
+        <Button type="primary" onClick={() => openSentenceModal(sentence)}>Read Full Sentence</Button>
       ),
     },
   ];
@@ -118,14 +140,22 @@ const DatasetViewerPage = () => {
       <Title level={2}>Dataset Viewer</Title>
 
       <Card>
-        <div className="flex gap-4 mb-4">
-          <Input
-            placeholder="Filter by User ID"
-            prefix={<SearchOutlined />}
-            value={userId}
-            onChange={(e) => setUserId(e.target.value)}
-            style={{ width: 200 }}
+        <div className="flex w-full justify-between gap-4 mb-4">
+          <Select
+            showSearch
+            placeholder="Select User"
+            optionFilterProp="children"
+            value={userId || undefined}
+            onChange={setUserId}
+            onSearch={debouncedSearch}
+            loading={isLoadingUsers}
             allowClear
+            style={{ width: 450 }}
+            options={userData?.users.map(user => ({
+              value: user.agent_id,
+              label: `${user.name} (${user.service_name})`,
+            }))}
+            filterOption={false}
           />
           <Space>
             <span>Show Reported Only:</span>
@@ -142,11 +172,28 @@ const DatasetViewerPage = () => {
             current: currentPage,
             pageSize: pageSize,
             total: data?.total ?? 0,
+            showTotal: (total) => (
+              <span>
+                Total: <strong>{total}</strong>
+              </span>
+            ),
             onChange: setCurrentPage,
             showSizeChanger: false,
           }}
         />
       </Card>
+
+      <Modal
+        title={` Full Sentence`}
+        visible={isSentenceModalOpen}
+        onCancel={() => setIsSentenceModalOpen(false)}
+        footer={null}
+        width={1000}
+      >
+        <Typography.Paragraph className="text-xl">
+          {selectedSentence}
+        </Typography.Paragraph>
+      </Modal>
     </div>
   );
 };
