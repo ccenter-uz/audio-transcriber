@@ -25,6 +25,22 @@ const STATUS_LABELS = {
   ready: "Tayyor",
 };
 
+const REPORT_TAGS = {
+  BAD_AUDIO: "Eshitib bo‘lmaydigan",
+  FULL_RUSSIAN: "Bo'lak ≥ 80 % ruscha",
+  SILENCE: "2 soniyadan uzun sukunat",
+  MISSING_AUDIO: "Bo‘sh yoki buzilgan fayl",
+};
+
+const TRANSCRIPT_TAGS = {
+  INAUDIBLE: "Eshitib bo‘lmaydigan",
+  LONG_UNINTELLIGIBLE: "Uzoq tushunarsiz",
+  OVERLAP: "Ikki kishi birga gapirishi natijasida so‘zlar ustma‑ust",
+  LAUGH: "Kulish",
+  MUSIC: "IVR signali yoki musiqa",
+  BEEP: "Boshqa aniq shovqin",
+};
+
 export default function TranscriptionEditor() {
   const [currentChunk, setCurrentChunk] = useState(1);
   const [transcription, setTranscription] = useState("");
@@ -267,7 +283,6 @@ export default function TranscriptionEditor() {
 
   // Open the ready status chunk as default when all chunks are done open the last chunk
   useEffect(() => {
-    
     if (chunks.length > 0) {
       const readyChunk = chunks.findIndex(
         (chunk: { status: string }) => chunk.status === "ready"
@@ -283,14 +298,15 @@ export default function TranscriptionEditor() {
       } else if (isAllDone) {
         // If all chunks are done, set to the last chunk
         setCurrentChunk(chunks.length);
-        setStartIndex(Math.floor((chunks.length - 1) / VISIBLE_CHUNKS) * VISIBLE_CHUNKS);
+        setStartIndex(
+          Math.floor((chunks.length - 1) / VISIBLE_CHUNKS) * VISIBLE_CHUNKS
+        );
       } else {
         // If no ready chunk, set to the first chunk
         setCurrentChunk(1);
         setStartIndex(0);
       }
     }
-
   }, [chunks]);
 
   return (
@@ -331,6 +347,22 @@ export default function TranscriptionEditor() {
               "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
           }}
         />
+
+        {/* Generate some useful tags here. Tags:  [INAUDIBLE], [LONG_UNINTELLIGIBLE], [OVERLAP], [LAUGH], [BEEP], [MUSIC]. When user hower the tag, description will be shown */}
+        <div className="mt-4 flex flex-wrap gap-2">
+          {Object.keys(TRANSCRIPT_TAGS).map((tag) => (
+            <Tag
+              key={tag}
+              color="geekblue"
+              className="cursor-pointer"
+              onClick={() => setTranscription((prev) => `${prev} [${tag}] `)}>
+              [{tag}]
+              <span className="ml-1 text-sm text-gray-500">
+                {TRANSCRIPT_TAGS[tag as keyof typeof TRANSCRIPT_TAGS]}
+              </span>
+            </Tag>
+          ))}
+        </div>
       </div>
 
       {/* Right-hand Chunk Status */}
@@ -376,7 +408,7 @@ export default function TranscriptionEditor() {
             Xabar berish
           </Button>
 
-            <div className="flex w-[50%] justify-center">
+          <div className="flex w-[50%] justify-center">
             <audio
               ref={playerRef}
               src={chunks[currentChunk - 1]?.file_path}
@@ -385,13 +417,12 @@ export default function TranscriptionEditor() {
               className="w-full"
               controlsList="nodownload"
               style={{
-              borderRadius: "1rem",
-              backgroundColor: "transparent",
-              }}
-            >
+                borderRadius: "1rem",
+                backgroundColor: "transparent",
+              }}>
               Your browser does not support the audio element.
             </audio>
-            </div>
+          </div>
 
           <Button
             type="primary"
@@ -468,7 +499,7 @@ export default function TranscriptionEditor() {
             Yuborish
           </Button>,
         ]}>
-        <p>Bu qism haqida muammo bormi?</p>
+        <p>Bu qismda muammo bormi?</p>
         <TextArea
           placeholder="Muammoni tavsiflang..."
           rows={4}
@@ -477,6 +508,22 @@ export default function TranscriptionEditor() {
           onChange={(e) => setReportText(e.target.value)}
           disabled={transcription.length > 0}
         />
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          {Object.keys(REPORT_TAGS).map((tag) => (
+            <Tag
+              key={tag}
+              color="geekblue"
+              className="cursor-pointer"
+              onClick={() => setReportText((prev) => `${prev} [${tag}] `)}>
+              [{tag}]
+              <span className="ml-1 text-xs text-gray-500">
+                {REPORT_TAGS[tag as keyof typeof REPORT_TAGS]}
+              </span>
+            </Tag>
+          ))}
+        </div>
+
         {transcription.length > 0 && (
           <p className="text-red-500 mt-2">
             Transkript qilingan qism uchun muammo xabar qilib bo'lmaydi
