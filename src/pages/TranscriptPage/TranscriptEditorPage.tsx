@@ -319,9 +319,7 @@ export default function TranscriptionEditor() {
   useEffect(() => {
     if (firstKeyPress) {
       transcriptApi.startTranscript(chunks[currentChunk - 1]?.id);
-      message.info(
-        "Transkriptsiya jarayoni boshlandi."
-      );
+      message.info("Transkriptsiya jarayoni boshlandi.");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [firstKeyPress]);
@@ -370,6 +368,13 @@ export default function TranscriptionEditor() {
 
         {/* Generate some useful tags here. Tags:  [INAUDIBLE], [LONG_UNINTELLIGIBLE], [OVERLAP], [LAUGH], [BEEP], [MUSIC]. When user hower the tag, description will be shown */}
         <div className="mt-4 flex flex-wrap gap-2">
+          <Tag
+            key={"ru"}
+            color="geekblue"
+            className="cursor-pointer"
+            onClick={() => setTranscription((prev) => `${prev} (ru: ) `)}>
+            (ru: ):<span className="ml-1 text-sm text-gray-500">Ruscha so‘z</span>
+          </Tag>
           {Object.keys(TRANSCRIPT_TAGS).map((tag) => (
             <Tag
               key={tag}
