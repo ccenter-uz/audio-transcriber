@@ -50,6 +50,7 @@ export default function TranscriptionEditor() {
   const [reportText, setReportText] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showFinishModal, setShowFinishModal] = useState(false);
+  const [firstKeyPress, setFirstKeyPress] = useState(false);
   const playerRef = useRef<HTMLAudioElement>(null);
   const chunkListRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth(); // Assuming you have a useAuth hook to get user info
@@ -72,6 +73,11 @@ export default function TranscriptionEditor() {
     setTranscription(value);
   };
 
+  const handleKeyDown = () => {
+    if (firstKeyPress) return; // Ignore subsequent key presses
+    setFirstKeyPress(true);
+  };
+
   const handleFinish = async () => {
     try {
       // Save the last transcript if it exists
@@ -79,6 +85,7 @@ export default function TranscriptionEditor() {
         await transcriptApi.updateTranscript(chunks[currentChunk - 1].id, {
           transcribe_text: transcription,
         });
+        message.success("Transkript muvaffaqiyatli saqlandi");
       }
 
       // Clear both audio_id and current chunk from localStorage
@@ -96,7 +103,6 @@ export default function TranscriptionEditor() {
   const handleNext = async () => {
     if (currentChunk < chunks.length) {
       if (transcription.trim()) {
-        console.log("Current transcription:", transcription);
         try {
           setIsSubmitting(true);
           handleScrollDown();
@@ -108,6 +114,7 @@ export default function TranscriptionEditor() {
           message.success("Transkript muvaffaqiyatli saqlandi");
           // Only navigate after successful save
           setTranscription("");
+          setFirstKeyPress(false);
           if (playerRef.current) {
             playerRef.current.currentTime = 0;
           }
@@ -309,6 +316,16 @@ export default function TranscriptionEditor() {
     }
   }, [chunks]);
 
+  useEffect(() => {
+    if (firstKeyPress) {
+      transcriptApi.startTranscript(chunks[currentChunk - 1]?.id);
+      message.info(
+        "Transkriptsiya jarayoni boshlandi."
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firstKeyPress]);
+
   return (
     <div className="mt-[-120px] flex flex-col min-h-screen justify-between bg-gray-50">
       {/* Centered Input */}
@@ -328,6 +345,8 @@ export default function TranscriptionEditor() {
             {STATUS_LABELS[
               chunks[currentChunk - 1]?.status as keyof typeof STATUS_LABELS
             ]?.toUpperCase()}
+
+            {firstKeyPress && "true"}
           </Tag>
         </Title>
 
@@ -336,6 +355,7 @@ export default function TranscriptionEditor() {
           placeholder="Tinglagan so'zni yozing..."
           value={transcription}
           onChange={handleTranscriptionChange}
+          onKeyDown={handleKeyDown}
           autoSize={{ minRows: 4, maxRows: 8 }}
           bordered={false}
           style={{

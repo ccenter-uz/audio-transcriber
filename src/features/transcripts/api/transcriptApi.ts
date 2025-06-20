@@ -53,6 +53,7 @@ export interface DatasetViewerItem {
   report_text: string;
   transcriber: string;
   transcriber_id: string;
+  minutes_spent: number;
 }
 
 export interface DatasetViewerResponse {
@@ -108,6 +109,9 @@ export const transcriptApi = {
 
   async updateTranscript(chunkId: number, data: TranscriptUpdate): Promise<void> {
     await axiosInstance.put(`/api/v1/transcript/update?id=${chunkId}`, data);
+  },
+  async startTranscript(chunkId: number): Promise<void> {
+    await axiosInstance.put(`/api/v1/transcript/start?id=${chunkId}`);
   },
 
   async getTranscript(id: number): Promise<TranscriptDetail> {

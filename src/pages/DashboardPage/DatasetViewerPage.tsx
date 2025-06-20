@@ -125,12 +125,21 @@ const DatasetViewerPage = () => {
       ),
     },
     {
+      title: "Minutes Spent",
+      dataIndex: "minutes_spent",
+      key: "minutes_spent",
+      width: 200,
+      render: (minutes: number) => <span>{minutes} minutes</span>,
+    },
+    {
       title: "Full Sentence",
       dataIndex: "sentence",
       key: "sentence",
       width: 200,
       render: (sentence: string) => (
-        <Button type="primary" onClick={() => openSentenceModal(sentence)}>Read Full Sentence</Button>
+        <Button type="primary" onClick={() => openSentenceModal(sentence)}>
+          Read Full Sentence
+        </Button>
       ),
     },
   ];
@@ -151,7 +160,7 @@ const DatasetViewerPage = () => {
             loading={isLoadingUsers}
             allowClear
             style={{ width: 450 }}
-            options={userData?.users.map(user => ({
+            options={userData?.users.map((user) => ({
               value: user.agent_id,
               label: `${user.name} (${user.service_name})`,
             }))}
@@ -188,8 +197,7 @@ const DatasetViewerPage = () => {
         visible={isSentenceModalOpen}
         onCancel={() => setIsSentenceModalOpen(false)}
         footer={null}
-        width={1000}
-      >
+        width={1000}>
         <Typography.Paragraph className="text-xl">
           {selectedSentence}
         </Typography.Paragraph>
