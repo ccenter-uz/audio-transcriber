@@ -344,7 +344,6 @@ export default function TranscriptionEditor() {
               chunks[currentChunk - 1]?.status as keyof typeof STATUS_LABELS
             ]?.toUpperCase()}
 
-            {firstKeyPress && "true"}
           </Tag>
         </Title>
 
