@@ -13,6 +13,7 @@ export interface LineGraphData {
   done_chunks: number;
   error_audio_files: number;
   invalid_chunks: number;
+  active_operators: number;
 }
 
 // Real API call (commented out for now)
