@@ -125,11 +125,29 @@ const DatasetViewerPage = () => {
       ),
     },
     {
-      title: "Minutes Spent",
+      title: "Time Spent (Format: MM:SS)",
       dataIndex: "minutes_spent",
       key: "minutes_spent",
-      width: 200,
-      render: (minutes: number) => <span>{minutes} minutes</span>,
+      width: 250,
+      align: "center",
+      // Convert 1.5 to "1 minute 30 seconds"
+      render: (minutes: number) => {
+        const minutesInt = Math.floor(minutes);
+        const seconds = (minutes - minutesInt) * 60;
+        return (
+          <strong>
+            {minutesInt > 0 ? `${minutesInt}` : "0"}
+            {":"}
+            {seconds > 0
+              ? `${
+                  Number(seconds.toFixed(0)) >= 10
+                    ? seconds.toFixed(0)
+                    : "0" + seconds.toFixed(0)
+                }`
+              : "0"}
+          </strong>
+        );
+      },
     },
     {
       title: "Full Sentence",
