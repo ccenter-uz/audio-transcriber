@@ -302,19 +302,18 @@ export default function TranscriptionEditor() {
         (chunk: { status: string }) => chunk.status === "ready"
       );
 
-      const isAllDone = chunks.every(
-        (chunk: { status: string }) => chunk.status === "done"
+      const isAllProcessed = chunks.every(
+        (chunk: { status: string }) =>
+          chunk.status === "done" || chunk.status === "invalid"
       );
 
       if (readyChunk !== -1) {
         setCurrentChunk(readyChunk + 1);
         setStartIndex(Math.floor(readyChunk / VISIBLE_CHUNKS) * VISIBLE_CHUNKS);
-      } else if (isAllDone) {
+      } else if (isAllProcessed) {
         // If all chunks are done, set to the last chunk
         setCurrentChunk(chunks.length);
-        setStartIndex(
-          Math.floor((chunks.length - 1) / VISIBLE_CHUNKS) * VISIBLE_CHUNKS
-        );
+        setStartIndex(Math.floor(chunks.length - VISIBLE_CHUNKS));
       } else {
         // If no ready chunk, set to the first chunk
         setCurrentChunk(1);
