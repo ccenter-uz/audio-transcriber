@@ -14,9 +14,12 @@ import { transcriptApi } from "@/features/transcripts/api/transcriptApi";
 import "react-h5-audio-player/lib/styles.css";
 import "tailwindcss/tailwind.css";
 import { useAuth } from "@/shared/lib/auth.tsx";
+import Transliterator from "lotin-kirill";
+
 const CURRENT_CHUNK_KEY = "current_chunk";
 const { TextArea } = Input;
 const { Title } = Typography;
+const transliterator = new Transliterator();
 
 const STATUS_LABELS = {
   done: "Tugallangan",
@@ -65,6 +68,10 @@ export default function TranscriptionEditor() {
 
   // Show no audio modal if data is loaded but empty
   const showNoAudioModal = !isLoading && !error && chunks.length === 0;
+
+  const handleTransliterate = (text: string) => {
+    return transliterator.toLatin(text);
+  };
 
   const handleTranscriptionChange = (
     e: React.ChangeEvent<HTMLTextAreaElement>
@@ -343,7 +350,6 @@ export default function TranscriptionEditor() {
             {STATUS_LABELS[
               chunks[currentChunk - 1]?.status as keyof typeof STATUS_LABELS
             ]?.toUpperCase()}
-
           </Tag>
         </Title>
 
@@ -366,26 +372,39 @@ export default function TranscriptionEditor() {
         />
 
         {/* Generate some useful tags here. Tags:  [INAUDIBLE], [LONG_UNINTELLIGIBLE], [OVERLAP], [LAUGH], [BEEP], [MUSIC]. When user hower the tag, description will be shown */}
-        <div className="mt-4 flex flex-wrap gap-2">
-          <Tag
-            key={"ru"}
-            color="geekblue"
-            className="cursor-pointer"
-            onClick={() => setTranscription((prev) => `${prev} (ru: ) `)}>
-            (ru: ):<span className="ml-1 text-sm text-gray-500">Ruscha so‘z</span>
-          </Tag>
-          {Object.keys(TRANSCRIPT_TAGS).map((tag) => (
+        <div className="w-full mt-4 flex flex-row-reverse items-start">
+          <Button
+            disabled={transcription.length === 0}
+            className="mr-4 bg-blue-600 text-white hover:bg-blue-700 transition-all duration-200"
+            icon={<CheckCircleOutlined />}
+            onClick={() => {
+              const result = handleTransliterate(transcription);
+              setTranscription(result);
+            }}>
+            Krilldan Lotinga
+          </Button>
+          <div className="flex flex-wrap gap-2 w-[80%]">
             <Tag
-              key={tag}
+              key={"ru"}
               color="geekblue"
               className="cursor-pointer"
-              onClick={() => setTranscription((prev) => `${prev} [${tag}] `)}>
-              [{tag}]
-              <span className="ml-1 text-sm text-gray-500">
-                {TRANSCRIPT_TAGS[tag as keyof typeof TRANSCRIPT_TAGS]}
-              </span>
+              onClick={() => setTranscription((prev) => `${prev} (ru: ) `)}>
+              (ru: ):
+              <span className="ml-1 text-sm text-gray-500">Ruscha so‘z</span>
             </Tag>
-          ))}
+            {Object.keys(TRANSCRIPT_TAGS).map((tag) => (
+              <Tag
+                key={tag}
+                color="geekblue"
+                className="cursor-pointer"
+                onClick={() => setTranscription((prev) => `${prev} [${tag}] `)}>
+                [{tag}]
+                <span className="ml-1 text-sm text-gray-500">
+                  {TRANSCRIPT_TAGS[tag as keyof typeof TRANSCRIPT_TAGS]}
+                </span>
+              </Tag>
+            ))}
+          </div>
         </div>
       </div>
 
