@@ -128,21 +128,17 @@
   fill: #ebedf0;
 }
 
-.react-calendar-heatmap .color-scale-1 {
-  fill: #9be9a8;
-}
+/* Yellow → Red */
+.react-calendar-heatmap .color-scale-1 { fill: #fff4cd; } /* pastel yellow */
+.react-calendar-heatmap .color-scale-2 { fill: #ffd993; }
+.react-calendar-heatmap .color-scale-3 { fill: #ffb55e; }
+.react-calendar-heatmap .color-scale-4 { fill: #ff8740; }
+.react-calendar-heatmap .color-scale-5 { fill: #d63d2d; } /* brick red */
 
-.react-calendar-heatmap .color-scale-2 {
-  fill: #40c463;
-}
 
-.react-calendar-heatmap .color-scale-3 {
-  fill: #30a14e;
-}
 
-.react-calendar-heatmap .color-scale-4 {
-  fill: #216e39;
-}
+
+
 
 /* Responsive tweaks for heatmap */
 @media (max-width: 768px) {

@@ -1,4 +1,4 @@
-import { Card, Spin, Typography, Select } from "antd";
+import { Card, Spin, Typography } from "antd";
 import { useParams, Navigate } from "react-router-dom";
 import { useUserStats } from "@/features/transcripts/hooks/useUserStats";
 import { useAuth } from "@/shared/lib/auth.tsx";
@@ -12,7 +12,6 @@ const UserDetailsPage = () => {
   const { userId } = useParams();
   const { data, isLoading, error } = useUserStats(userId);
   const { user } = useAuth();
-  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [heatmapData, setHeatmapData] = useState<
     { date: string; count: number }[]
   >([]);
@@ -24,6 +23,8 @@ const UserDetailsPage = () => {
         date,
         count: count as number,
       }));
+
+      console.log("Heatmap Data:", formattedData);
 
       setHeatmapData(formattedData);
     }
@@ -45,15 +46,12 @@ const UserDetailsPage = () => {
   if (error || !data) {
     return (
       <div className="flex h-[80vh] items-center justify-center">
-        <p className="text-red-500">Foydalanuvchi ma'lumotlarini yuklashda xatolik</p>
+        <p className="text-red-500">
+          Foydalanuvchi ma'lumotlarini yuklashda xatolik
+        </p>
       </div>
     );
   }
-
-  const yearOptions = [
-    { value: 2025, label: "2025" },
-    { value: 2024, label: "2024" },
-  ];
 
   return (
     <div className="space-y-6">
@@ -115,11 +113,6 @@ const UserDetailsPage = () => {
       <Card>
         <div className="flex justify-between items-center mb-4">
           <Title level={4}>Faollik Ko'rsatkichi</Title>
-          <Select
-            value={selectedYear}
-            onChange={setSelectedYear}
-            options={yearOptions}
-          />
         </div>
         <div className="w-[90%] flex justify-start overflow-x-auto">
           <CalendarHeatmap
@@ -131,19 +124,18 @@ const UserDetailsPage = () => {
             values={heatmapData}
             classForValue={(value) => {
               if (!value || !value.count) return "color-empty";
-              if (value.count <= 2) return "color-scale-1";
-              if (value.count <= 4) return "color-scale-2";
-              if (value.count <= 6) return "color-scale-3";
-              return "color-scale-4";
+              if (value.count <= 50) return "color-scale-1";
+              if (value.count <= 150) return "color-scale-2";
+              if (value.count <= 250) return "color-scale-3";
+              if (value.count <= 350) return "color-scale-4";
+              return "color-scale-5";
             }}
             showWeekdayLabels={true}
             showMonthLabels={true}
             tooltipDataAttrs={() => {
               return { rx: "1", ry: "1" };
             }}
-            weekdayLabels={[
-              "", "Du", "", "Cho", "", "Ju", "",
-            ]}
+            weekdayLabels={["", "Du", "", "Cho", "", "Ju", ""]}
             titleForValue={(value) => {
               if (!value) return "Bo'laklar yo'q";
               return `${value.date} sanasida ${value.count} ta bo'lak`;
