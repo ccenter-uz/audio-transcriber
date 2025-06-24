@@ -17,8 +17,7 @@ import dayjs from "dayjs";
 
 const { Title } = Typography;
 
-const dateFormat = 'YYYY-MM-DD';
-
+const dateFormat = "YYYY-MM-DD";
 
 const DashboardPage = () => {
   const [fromDate, setFromDate] = useState<string>(
@@ -175,7 +174,13 @@ const DashboardPage = () => {
           <LineChart
             width={500}
             height={300}
-            data={lineGraphData}
+            data={
+              lineGraphData?.map((item) => ({
+                ...item,
+                expexected_result:
+                  Math.round(item.active_operators * 560) - item.invalid_chunks,
+              })) || []
+            }
             margin={{
               top: 5,
               right: 30,
@@ -187,6 +192,13 @@ const DashboardPage = () => {
             <YAxis />
             <Tooltip />
             <Legend />
+            <Line
+              type="monotone"
+              dataKey="expexected_result"
+              stroke="blue"
+              strokeWidth={2}
+              activeDot={{ r: 8 }}
+            />
             <Line
               type="monotone"
               dataKey="done_chunks"
