@@ -85,7 +85,7 @@ const Layout = () => {
         </div>
       </Header>
 
-      <Content className="bg-gray-50 p-6 w-full min-h-[calc(100vh-64px)] overflow-auto">
+      <Content className="bg-gray-50 p-6 pt-15 w-full min-h-[calc(100vh-64px)] overflow-hidden">
         <div className="w-full max-w-full">
           <Outlet />
         </div>

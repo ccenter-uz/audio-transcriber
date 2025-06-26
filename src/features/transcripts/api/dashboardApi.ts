@@ -1,6 +1,6 @@
 import axiosInstance from '@/shared/api/axios';
 import { AudioFileStats } from '../types';
-import { DashboardLineGraphParams } from '../hooks/useDashboardStatsGraph';
+import { DashboardLineGraphParams, HourlyParams } from '../hooks/useDashboardStatsGraph';
 
 export interface DashboardData {
   audioStats: AudioFileStats[];
@@ -14,6 +14,15 @@ export interface LineGraphData {
   error_audio_files: number;
   invalid_chunks: number;
   active_operators: number;
+}
+export interface HourlyLineGraphData {
+  hour_range: string;
+  count: number;
+}
+export interface HourlyLineGraphResponse {
+  user_id: string;
+  username: string;
+  daily_transcripts: HourlyLineGraphData[];
 }
 
 // Real API call (commented out for now)
@@ -37,4 +46,14 @@ export const fetchDashboardLineGraphStats = async (params: DashboardLineGraphPar
   const lineGraphStatsResponse = await axiosInstance.get<LineGraphData[]>(`/api/v1/dashboard/stats?fromDate=${params.fromDate}&toDate=${params.toDate}`);
 
   return lineGraphStatsResponse.data;
+};
+
+interface HourlyLineGraphResponseExtended {
+  data: HourlyLineGraphResponse[];
+}
+
+export const fetchHourlyStats = async (params: HourlyParams): Promise<HourlyLineGraphResponse[]> => {
+  // Ensure params are defined and have default values
+  const hourlyStatsResponse = await axiosInstance.get<HourlyLineGraphResponseExtended>(`/api/v1/dashboard/hours?userId=${params.userId}&date=${params.date}`);
+  return hourlyStatsResponse.data.data;
 };
