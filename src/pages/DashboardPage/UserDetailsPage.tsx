@@ -58,10 +58,14 @@ const UserDetailsPage = () => {
 
   // Prepare hourly stats data for the graph which describes the user's activity in 24 hours
   useEffect(() => {
-    const fullDay = Array.from({ length: 24 }, (_, i) => ({
-      hour_range: `${i < 10 ? "0" : ""}${i}:00`,
+    const fullDay = Array.from({ length: 48 }, (_, i) => {
+      const hour = Math.floor(i / 2);
+      const minute = i % 2 === 0 ? "00" : "30";
+      return {
+      hour_range: `${hour < 10 ? "0" : ""}${hour}:${minute}`,
       count: 0,
-    }));
+      };
+    });
 
     if (userId && hourlyStatsResponse?.length === 1) {
       const userStats = hourlyStatsResponse[0];
