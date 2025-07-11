@@ -8,14 +8,17 @@ import {
   Space,
   Tag,
   Button,
+  Input,
+  message,
 } from "antd";
 import { useDatasetViewer } from "@/features/transcripts/hooks/useDatasetViewer";
 import { useUserList } from "@/features/transcripts/hooks/useUserList";
 import {
+  transcriptApi,
   type DatasetViewerItem,
   type DatasetViewerResponse,
 } from "@/features/transcripts/api/transcriptApi";
-import { WarningOutlined } from "@ant-design/icons";
+import { WarningOutlined, EditFilled } from "@ant-design/icons";
 import type { TableProps } from "antd";
 import { Link } from "react-router-dom";
 import Modal from "antd/es/modal/Modal";
@@ -50,6 +53,9 @@ const DatasetViewerPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isSentenceModalOpen, setIsSentenceModalOpen] = useState(false);
   const [selectedSentence, setSelectedSentence] = useState<string>("");
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [currentChunk, setCurrentChunk] = useState<number>();
+  const [editSentence, setEditSentence] = useState<string>("");
   const pageSize = 10;
 
   const { data: userData, isLoading: isLoadingUsers } = useUserList({
@@ -57,12 +63,13 @@ const DatasetViewerPage = () => {
     limit: 50,
   });
 
-  const { data, isLoading } = useDatasetViewer({
+  const { data, isLoading, refetch } = useDatasetViewer({
     user_id: userId || undefined,
     report: showReported,
     offset: (currentPage - 1) * pageSize,
     limit: pageSize,
-  }) as { data: DatasetViewerResponse | undefined; isLoading: boolean };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  }) as { data: DatasetViewerResponse | undefined; isLoading: boolean; refetch: () => Promise<any> };
 
   const debouncedSearch = debounce((value: string) => {
     setSearchText(value);
@@ -71,6 +78,27 @@ const DatasetViewerPage = () => {
   const openSentenceModal = (sentence: string) => {
     setSelectedSentence(sentence);
     setIsSentenceModalOpen(true);
+  };
+  const openEditModal = (sentence: string, currentChunk: number) => {
+    setEditSentence(sentence);
+    setCurrentChunk(currentChunk);
+    setIsEditModalOpen(true);
+  };
+
+  const handleEditSentence = async () => {
+    if (!currentChunk) {
+      console.error("Current chunk is not set");
+      return;
+    }
+      await transcriptApi.updateTranscript(currentChunk, {
+      transcribe_text: editSentence,
+      report_text: null, // Clear report text if transcription is provided
+    });
+    await refetch(); // Refetch audio segments to get updated status
+    message.success("Transkript muvaffaqiyatli yangilandi");
+    setIsEditModalOpen(false);
+    setEditSentence("");
+    setCurrentChunk(undefined);
   };
 
   const columns: TableProps<DatasetViewerItem>["columns"] = [
@@ -90,6 +118,9 @@ const DatasetViewerPage = () => {
       title: "Chunk Info",
       key: "chunk",
       width: 400,
+
+      
+
       render: (record: DatasetViewerItem) => (
         <Space direction="vertical" size="small">
           <div>ID: {record.chunk_id}</div>
@@ -107,7 +138,18 @@ const DatasetViewerPage = () => {
               <div className="text-gray-500">
                 Previous: {record.previous_text}
               </div>
-              <div className="font-medium">{record.text}</div>
+              <div className="flex justify-center items-center">
+                <p className="text-left w-full font-medium mb-0 p-0">
+                  {record.text || "No context available"}
+                </p>
+
+                <Button
+                  className=""
+                  aria-label="Edit Sentence"
+                  type="text"
+                  icon={<EditFilled className="text-blue-500" />}
+                  onClick={() => openEditModal(record.text || "", record.chunk_id)}></Button>
+              </div>
               <div className="text-gray-500">Next: {record.next_text}</div>
             </>
           )}
@@ -230,6 +272,20 @@ const DatasetViewerPage = () => {
         <Typography.Paragraph className="text-xl">
           {selectedSentence}
         </Typography.Paragraph>
+      </Modal>
+      <Modal
+        title={` Edit Sentence`}
+        visible={isEditModalOpen}
+        onCancel={() => setIsEditModalOpen(false)}
+        footer={null}
+        width={1000}>
+        <Input
+          value={editSentence}
+          onChange={(e) => setEditSentence(e.target.value)}
+        />
+        <Button type="primary" className="mt-4" onClick={handleEditSentence}>
+          Save Changes
+        </Button>
       </Modal>
     </div>
   );
