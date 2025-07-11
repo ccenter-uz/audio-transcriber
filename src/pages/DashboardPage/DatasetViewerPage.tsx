@@ -231,7 +231,7 @@ const DatasetViewerPage = () => {
             loading={isLoadingUsers}
             allowClear
             style={{ width: 450 }}
-            options={userData?.users.map((user) => ({
+            options={userData?.users?.map((user) => ({
               value: user.agent_id,
               label: `${user.name} (${user.service_name})`,
             }))}
