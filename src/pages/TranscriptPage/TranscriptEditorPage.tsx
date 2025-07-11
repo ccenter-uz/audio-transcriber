@@ -44,9 +44,53 @@ const TRANSCRIPT_TAGS = {
   BEEP: "Boshqa aniq shovqin",
 };
 
+const EMOTION_TAGS = [
+  {
+    label: "Neytral",
+    color: "	#9E9E9E",
+  },
+  {
+    label: "Xursand",
+    color: "#FFD54F",
+  },
+  {
+    label: "Mamnun",
+    color: "#4CAF50",
+  },
+  {
+    label: "Jahldor",
+    color: "#F44336",
+  },
+  {
+    label: "Xafa",
+    color: "#2196F3",
+  },
+  {
+    label: "Qo‘rquv",
+    color: "#9C27B0",
+  },
+  {
+    label: "Hayrat",
+    color: "#FF9800",
+  },
+  {
+    label: "Nafrat",
+    color: "#795548",
+  },
+  {
+    label: "Boshqa",
+    color: "#607D8B",
+  },
+  {
+    label: "Nutqsiz / Shovqin",
+    color: "#BDBDBD",
+  },
+];
+
 export default function TranscriptionEditor() {
   const [currentChunk, setCurrentChunk] = useState(1);
   const [transcription, setTranscription] = useState("");
+  const [emotion, setEmotion] = useState("");
   const [isFinished, setIsFinished] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [startIndex, setStartIndex] = useState(0);
@@ -91,8 +135,9 @@ export default function TranscriptionEditor() {
       if (transcription.trim()) {
         await transcriptApi.updateTranscript(chunks[currentChunk - 1].id, {
           transcribe_text: transcription,
+          emotion: emotion || null, // Save emotion if selected
         });
-        message.success("Transkript muvaffaqiyatli saqlandi");
+        message.success("Transkript muvaffaqiyatli saqlandi dsfsdfsd");
       }
 
       // Clear both audio_id and current chunk from localStorage
@@ -115,12 +160,14 @@ export default function TranscriptionEditor() {
           handleScrollDown();
           await transcriptApi.updateTranscript(chunks[currentChunk - 1].id, {
             transcribe_text: transcription,
+            emotion: emotion || null, // Save emotion if selected
             report_text: null, // Clear report text if transcription is provided
           });
           await refetch(); // Refetch audio segments to get updated status
-          message.success("Transkript muvaffaqiyatli saqlandi");
+          message.success("Transkript muvaffaqiyatli saqlandi ");
           // Only navigate after successful save
           setTranscription("");
+          setEmotion("");
           setFirstKeyPress(false);
           if (playerRef.current) {
             playerRef.current.currentTime = 0;
@@ -136,6 +183,7 @@ export default function TranscriptionEditor() {
         // If no transcription, just navigate
         handleScrollDown();
         setTranscription("");
+        setEmotion("");
         if (playerRef.current) {
           playerRef.current.currentTime = 0;
         }
@@ -151,6 +199,7 @@ export default function TranscriptionEditor() {
     setCurrentChunk(absoluteIndex);
     // Reset states - they will be updated by the useEffect
     setTranscription("");
+    setEmotion("");
     setReportText("");
     if (playerRef.current) {
       playerRef.current.currentTime = 0;
@@ -166,6 +215,7 @@ export default function TranscriptionEditor() {
         setStartIndex(Math.min(chunks.length - VISIBLE_CHUNKS, startIndex + 1));
       }
       setTranscription("");
+      setEmotion("");
       if (playerRef.current) {
         playerRef.current.currentTime = 0;
       }
@@ -181,6 +231,7 @@ export default function TranscriptionEditor() {
         setStartIndex(Math.max(0, startIndex - 1));
       }
       setTranscription("");
+      setEmotion("");
       if (playerRef.current) {
         playerRef.current.currentTime = 0;
       }
@@ -249,11 +300,13 @@ export default function TranscriptionEditor() {
         // Set transcription text if it exists
         if (transcript.transcribe_text) {
           setTranscription(transcript.transcribe_text);
+          setEmotion(transcript.emotion || ""); // Set emotion if it exists
         } else if (transcript.ai_text) {
           // If no transcription but AI text exists, use that
           setTranscription(transcript.ai_text);
         } else {
           setTranscription("");
+          setEmotion(""); // Reset emotion if no transcription or AI text
         }
         // Set report text if it exists
         if (transcript.report_text) {
@@ -438,6 +491,23 @@ export default function TranscriptionEditor() {
       </div>
 
       {/* Bottom Controls */}
+      {/* Emotions tags will be here; each emotion has label and color */}
+      <div className="flex flex-wrap justify-center gap-2 mb-8">
+        {EMOTION_TAGS.map((item) => (
+          <Tag
+            key={item.label}
+            color={emotion === item.label ? item.color : "white"}
+            style={emotion !== item.label ? { backgroundColor: item.color + "20", color: item.color, borderColor: item.color } : { backgroundColor: item.color, color: "white", borderColor: item.color }}
+            onClick={() => {
+              setEmotion(item.label);
+            }}
+            className={`flex justify-center items-center cursor-pointer text-lg min-w-[100px] h-[40px] text-center`}>
+            {item.label}
+
+            
+          </Tag>
+        ))}
+      </div>
       <div className="flex justify-between gap-4 px-6 py-6 border-t w-full">
         <div className="flex justify-between items-center w-full">
           <Button

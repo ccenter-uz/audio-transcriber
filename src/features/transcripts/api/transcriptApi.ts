@@ -17,6 +17,7 @@ export interface AudioSegment {
 }
 
 export interface TranscriptDetail {
+  emotion: string | null; // Emotion field added
   ai_text: string;
   audio_id: number;
   audio_name: string;
@@ -38,6 +39,7 @@ export interface AudioSegmentResponse {
 export interface TranscriptUpdate {
   report_text?: string | null;
   transcribe_text?: string | null;
+  emotion?: string | null; // Emotion field added
 }
 
 export interface DatasetViewerItem {
