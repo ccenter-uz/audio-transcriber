@@ -46,7 +46,7 @@ const TRANSCRIPT_TAGS = {
 
 const EMOTION_TAGS = [
   {
-    label: "Neytral",
+    label: "Tabiiy",
     color: "	#9E9E9E",
   },
   {
@@ -72,10 +72,6 @@ const EMOTION_TAGS = [
   {
     label: "Nafrat",
     color: "#795548",
-  },
-  {
-    label: "Boshqa",
-    color: "#607D8B",
   }
 ];
 
