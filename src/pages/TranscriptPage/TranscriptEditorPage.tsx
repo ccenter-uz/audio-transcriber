@@ -54,10 +54,6 @@ const EMOTION_TAGS = [
     color: "#FFD54F",
   },
   {
-    label: "Mamnun",
-    color: "#4CAF50",
-  },
-  {
     label: "Jahldor",
     color: "#F44336",
   },
@@ -80,11 +76,7 @@ const EMOTION_TAGS = [
   {
     label: "Boshqa",
     color: "#607D8B",
-  },
-  {
-    label: "Nutqsiz / Shovqin",
-    color: "#BDBDBD",
-  },
+  }
 ];
 
 export default function TranscriptionEditor() {
