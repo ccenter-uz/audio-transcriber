@@ -156,7 +156,7 @@ const DatasetViewerPage = () => {
       width: 200,
       render: (emotion: string) => (
         <Tag color="blue" style={{ textTransform: "capitalize" }}>
-          {emotion?.toString()}
+          {emotion ? emotion : "Unknown"}
         </Tag>
       ),
     },
