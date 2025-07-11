@@ -150,6 +150,17 @@ const DatasetViewerPage = () => {
       },
     },
     {
+      title: "Emotion",
+      dataIndex: "emotion",
+      key: "emotion",
+      width: 200,
+      render: (emotion: string) => (
+        <Tag color="blue" style={{ textTransform: "capitalize" }}>
+          {emotion ? emotion : "Unknown"}
+        </Tag>
+      ),
+    },
+    {
       title: "Full Sentence",
       dataIndex: "sentence",
       key: "sentence",
