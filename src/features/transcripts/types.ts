@@ -44,9 +44,12 @@ export interface UserDashboardStats {
 }
 
 export interface AudioFileStats {
-  audio_file_id: number;
-  filename: string;
-  total_segments: number;
-  completed_segments: number;
-  percent: number;
+completed_audio_files: number;
+completed_segments: number;
+error_audio_files: number;
+pending_audio_files: number;
+processing_audio: number;
+report_segments: number;
+total_audio_files: number;
+total_segments: number;
 }

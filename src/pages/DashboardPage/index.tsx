@@ -94,7 +94,7 @@ const DashboardPage = () => {
           <div className="text-center">
             <p className="text-gray-600">Total Audio Files</p>
             <p className="text-2xl font-semibold text-blue-600">
-              {data?.audioStats?.length || 0}
+              {data.audioStats.total_audio_files}
             </p>
           </div>
         </Card>
@@ -102,10 +102,7 @@ const DashboardPage = () => {
           <div className="text-center">
             <p className="text-gray-600">Total Segments</p>
             <p className="text-2xl font-semibold text-green-600">
-              {data?.audioStats?.reduce(
-                (sum, file) => sum + file.total_segments,
-                0
-              ) || 0}
+              {data.audioStats.total_segments}
             </p>
             <p className="text-sm text-gray-500">Across all files</p>
           </div>
@@ -115,24 +112,11 @@ const DashboardPage = () => {
             <p className="text-gray-600">Completed Segments</p>
             <div>
               <p className="text-2xl font-semibold text-purple-600">
-                {data?.audioStats?.reduce(
-                  (sum, file) => sum + file.completed_segments,
-                  0
-                ) || 0}
+                {data.audioStats.completed_segments}
               </p>
               <p className="text-sm text-gray-500">
-                {Math.round(
-                  ((data?.audioStats?.reduce(
-                    (sum, file) => sum + file.completed_segments,
-                    0
-                  ) || 0) /
-                    (data?.audioStats?.reduce(
-                      (sum, file) => sum + file.total_segments,
-                      0
-                    ) || 1)) *
-                    100
-                )}
-                % Complete
+                { Math.round((data.audioStats.completed_segments / data.audioStats.total_segments) * 100) }%{" "}
+                <span className="text-gray-400">Complete</span>
               </p>
             </div>
           </div>
@@ -141,9 +125,7 @@ const DashboardPage = () => {
           <div className="text-center">
             <p className="text-gray-600">In Progress</p>
             <p className="text-2xl font-semibold text-orange-500">
-              {data?.audioStats?.filter(
-                (file) => file.percent > 0 && file.percent < 100
-              ).length || 0}
+              {data.audioStats.processing_audio}
             </p>
             <p className="text-sm text-gray-500">Files being processed</p>
           </div>

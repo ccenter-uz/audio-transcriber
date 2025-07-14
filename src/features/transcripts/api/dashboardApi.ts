@@ -32,12 +32,23 @@ export interface HourlyLineGraphResponse {
 // };
 
 // Using mock data for now
-export const fetchDashboardStats = async (): Promise<DashboardData> => {
-  const audioStatsResponse = await axiosInstance.get<AudioFileStats[]>('/api/v1/dashboard');
-
-  return {
-    audioStats: audioStatsResponse.data
+export interface DashboardApiResponse {
+  data: {
+    audioStats: AudioFileStats;
   };
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  error: any;
+  isLoading: boolean;
+  user: {
+    id: string;
+    role: string;
+  };
+}
+
+export const fetchDashboardStats = async (): Promise<DashboardApiResponse> => {
+  const audioStatsResponse = await axiosInstance.get('/api/v1/dashboard');
+  // Assuming the API returns the full structure as described
+  return audioStatsResponse.data as DashboardApiResponse;
 };
 export const fetchDashboardLineGraphStats = async (params: DashboardLineGraphParams): Promise<LineGraphData[]> => {
   // Ensure params are defined and have default values
