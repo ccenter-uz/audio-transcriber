@@ -3,19 +3,13 @@ import { fetchDashboardStats } from '../api/dashboardApi';
 import { AudioFileStats } from '../types';
 
 
-interface DashboardStats {
-  audioStats: AudioFileStats;
-}
-
 export const useDashboardStats = () => {
-  return useQuery<DashboardStats>({
+  return useQuery<AudioFileStats>({
     queryKey: ['dashboard-stats'],
     queryFn: async () => {
       const response = await fetchDashboardStats();
-      // Adapt response to match DashboardStats interface
-      return {
-        audioStats: response.data.audioStats,
-      };
+      // Adapt response to match AudioFileStats interface
+      return response;
     },
     refetchInterval: 30000, // Refetch every 30 seconds
   });

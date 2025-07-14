@@ -45,10 +45,11 @@ export interface DashboardApiResponse {
   };
 }
 
-export const fetchDashboardStats = async (): Promise<DashboardApiResponse> => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const fetchDashboardStats = async (): Promise<any> => {
   const audioStatsResponse = await axiosInstance.get('/api/v1/dashboard');
   // Assuming the API returns the full structure as described
-  return audioStatsResponse.data as DashboardApiResponse;
+  return audioStatsResponse.data as AudioFileStats;
 };
 export const fetchDashboardLineGraphStats = async (params: DashboardLineGraphParams): Promise<LineGraphData[]> => {
   // Ensure params are defined and have default values
