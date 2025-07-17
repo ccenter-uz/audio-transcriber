@@ -30,6 +30,7 @@ export interface TranscriptDetail {
   transcribe_text: string;
   user_id: string;
   username: string;
+  transcribe_option?: string | null; // Optional field for transcribe option
 }
 
 export interface AudioSegmentResponse {

@@ -10,7 +10,7 @@ import {
 } from "@ant-design/icons";
 import { useAudioSegments } from "@/features/transcripts/hooks/useAudioSegments";
 import { Link } from "react-router-dom";
-import { type AudioSegment } from "@/features/transcripts/api/transcriptApi";
+import { TranscriptDetail, type AudioSegment } from "@/features/transcripts/api/transcriptApi";
 import { transcriptApi } from "@/features/transcripts/api/transcriptApi";
 import "react-h5-audio-player/lib/styles.css";
 import "tailwindcss/tailwind.css";
@@ -80,6 +80,7 @@ const EMOTION_TAGS = [
 export default function TranscriptionEditor() {
   const [currentChunk, setCurrentChunk] = useState(1);
   const [transcription, setTranscription] = useState("");
+  const [transcriptItem, setTranscriptItem] = useState<TranscriptDetail | undefined>();
   const [emotion, setEmotion] = useState("");
   const [isFinished, setIsFinished] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -287,6 +288,7 @@ export default function TranscriptionEditor() {
         const transcript = await transcriptApi.getTranscript(
           chunks[currentChunk - 1].id
         );
+        setTranscriptItem(transcript);
         // Set transcription text if it exists
         if (transcript.transcribe_text) {
           setTranscription(transcript.transcribe_text);
@@ -394,12 +396,11 @@ export default function TranscriptionEditor() {
             ]?.toUpperCase()}
           </Tag>
         </Title>
-
-        {chunks[currentChunk - 1]?.transcribe_option && (
-          <div className="flex w-full rounded-md bg-gray-100 px-[12px] py-[20px] mb-[18px]">
-            <BulbOutlined className="text-yellow-500" />
-            <span className="ml-2 text-gray-700">
-              {chunks[currentChunk - 1]?.transcribe_option}
+        {transcriptItem?.transcribe_option && (
+          <div className="flex w-full items-start rounded-md bg-gray-100 px-[12px] py-[20px] mb-[18px]">
+            <BulbOutlined className="text-yellow-500 mt-[3px]" />
+            <span className="ml-2 text-gray-700 font-medium text-lg">
+              {transcriptItem?.transcribe_option}
             </span>
           </div>
         )}
