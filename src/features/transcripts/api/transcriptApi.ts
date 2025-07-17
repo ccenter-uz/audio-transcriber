@@ -14,6 +14,7 @@ export interface AudioSegment {
   file_path: string;
   id: number;
   status: string;
+  transcribe_option: string | null; // Added transcribe_option field
 }
 
 export interface TranscriptDetail {

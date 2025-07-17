@@ -6,6 +6,7 @@ import {
   UpOutlined,
   DownOutlined,
   CheckCircleOutlined,
+  BulbOutlined,
 } from "@ant-design/icons";
 import { useAudioSegments } from "@/features/transcripts/hooks/useAudioSegments";
 import { Link } from "react-router-dom";
@@ -42,6 +43,7 @@ const TRANSCRIPT_TAGS = {
   LAUGH: "Kulish",
   MUSIC: "IVR signali yoki musiqa",
   BEEP: "Boshqa aniq shovqin",
+  CURSE: "So'kinish",
 };
 
 const EMOTION_TAGS = [
@@ -72,7 +74,7 @@ const EMOTION_TAGS = [
   {
     label: "Nafrat",
     color: "#795548",
-  }
+  },
 ];
 
 export default function TranscriptionEditor() {
@@ -393,6 +395,15 @@ export default function TranscriptionEditor() {
           </Tag>
         </Title>
 
+        {chunks[currentChunk - 1]?.transcribe_option && (
+          <div className="flex w-full rounded-md bg-gray-100 px-[12px] py-[20px] mb-[18px]">
+            <BulbOutlined className="text-yellow-500" />
+            <span className="ml-2 text-gray-700">
+              {chunks[currentChunk - 1]?.transcribe_option}
+            </span>
+          </div>
+        )}
+
         <TextArea
           className="shadow-lg p-4 text-lg resize-none"
           placeholder="Tinglagan so'zni yozing..."
@@ -485,14 +496,24 @@ export default function TranscriptionEditor() {
           <Tag
             key={item.label}
             color={emotion === item.label ? item.color : "white"}
-            style={emotion !== item.label ? { backgroundColor: item.color + "20", color: item.color, borderColor: item.color } : { backgroundColor: item.color, color: "white", borderColor: item.color }}
+            style={
+              emotion !== item.label
+                ? {
+                    backgroundColor: item.color + "20",
+                    color: item.color,
+                    borderColor: item.color,
+                  }
+                : {
+                    backgroundColor: item.color,
+                    color: "white",
+                    borderColor: item.color,
+                  }
+            }
             onClick={() => {
               setEmotion(item.label);
             }}
             className={`flex justify-center items-center cursor-pointer text-lg min-w-[100px] h-[40px] text-center`}>
             {item.label}
-
-            
           </Tag>
         ))}
       </div>
