@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Table,
   Select,
@@ -50,6 +50,7 @@ const DatasetViewerPage = () => {
   const [userId, setUserId] = useState<string>("");
   const [searchText, setSearchText] = useState<string>("");
   const [showReported, setShowReported] = useState(false);
+  const [showRu, setShowRu] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSentenceModalOpen, setIsSentenceModalOpen] = useState(false);
   const [selectedSentence, setSelectedSentence] = useState<string>("");
@@ -58,6 +59,18 @@ const DatasetViewerPage = () => {
   const [editSentence, setEditSentence] = useState<string>("");
   const pageSize = 10;
 
+  // Get user id and role from localStorage
+  const storedUserId = localStorage.getItem("user-id");
+  const storedUserRole = localStorage.getItem("user-name");
+
+  // If user id is not set, use the stored user id
+  useEffect(() => {
+    if (storedUserRole !== "admin" && storedUserId) {
+      setUserId(storedUserId);
+    }
+  }, [storedUserRole, storedUserId]);
+
+  // If storedRole is admin, and then use useUserList hook working
   const { data: userData, isLoading: isLoadingUsers } = useUserList({
     name: searchText,
     limit: 50,
@@ -66,10 +79,15 @@ const DatasetViewerPage = () => {
   const { data, isLoading, refetch } = useDatasetViewer({
     user_id: userId || undefined,
     report: showReported,
+    ru: showRu,
     offset: (currentPage - 1) * pageSize,
-    limit: pageSize,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  }) as { data: DatasetViewerResponse | undefined; isLoading: boolean; refetch: () => Promise<any> };
+    limit: pageSize, 
+  }) as {
+    data: DatasetViewerResponse | undefined;
+    isLoading: boolean;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    refetch: () => Promise<any>;
+  };
 
   const debouncedSearch = debounce((value: string) => {
     setSearchText(value);
@@ -90,7 +108,7 @@ const DatasetViewerPage = () => {
       console.error("Current chunk is not set");
       return;
     }
-      await transcriptApi.updateTranscript(currentChunk, {
+    await transcriptApi.updateTranscript(currentChunk, {
       transcribe_text: editSentence,
       report_text: null, // Clear report text if transcription is provided
     });
@@ -119,8 +137,6 @@ const DatasetViewerPage = () => {
       key: "chunk",
       width: 400,
 
-      
-
       render: (record: DatasetViewerItem) => (
         <Space direction="vertical" size="small">
           <div>ID: {record.chunk_id}</div>
@@ -148,7 +164,9 @@ const DatasetViewerPage = () => {
                   aria-label="Edit Sentence"
                   type="text"
                   icon={<EditFilled className="text-blue-500" />}
-                  onClick={() => openEditModal(record.text || "", record.chunk_id)}></Button>
+                  onClick={() =>
+                    openEditModal(record.text || "", record.chunk_id)
+                  }></Button>
               </div>
               <div className="text-gray-500">Next: {record.next_text}</div>
             </>
@@ -221,25 +239,31 @@ const DatasetViewerPage = () => {
 
       <Card>
         <div className="flex w-full justify-between gap-4 mb-4">
-          <Select
-            showSearch
-            placeholder="Select User"
-            optionFilterProp="children"
-            value={userId || undefined}
-            onChange={setUserId}
-            onSearch={debouncedSearch}
-            loading={isLoadingUsers}
-            allowClear
-            style={{ width: 450 }}
-            options={userData?.users?.map((user) => ({
-              value: user.agent_id,
-              label: `${user.name} (${user.service_name})`,
-            }))}
-            filterOption={false}
-          />
+          {storedUserRole === "admin" && (
+            <Select
+              showSearch
+              placeholder="Select User"
+              optionFilterProp="children"
+              value={userId || undefined}
+              onChange={setUserId}
+              onSearch={debouncedSearch}
+              loading={isLoadingUsers}
+              allowClear
+              style={{ width: 450 }}
+              options={userData?.users?.map((user) => ({
+                value: user.agent_id,
+                label: `${user.name} (${user.service_name})`,
+              }))}
+              filterOption={false}
+            />
+          )}
           <Space>
             <span>Show Reported Only:</span>
             <Switch checked={showReported} onChange={setShowReported} />
+          </Space>
+          <Space>
+            <span>Show RU Only:</span>
+            <Switch checked={showRu} onChange={setShowRu} />
           </Space>
         </div>
 

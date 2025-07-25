@@ -40,7 +40,7 @@ const Layout = () => {
     ];
 
     // Add Dataset Viewer link for admin users
-    if (user?.role === "admin") {
+    if (user?.role) {
       menuItems.push({
         key: "/dataset",
         icon: <DatabaseOutlined />,

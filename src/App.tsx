@@ -95,7 +95,7 @@ function App() {
                 <Route
                   path="/dataset"
                   element={
-                    <RequireAuth role="admin">
+                    <RequireAuth >
                       <DatasetViewerPage />
                     </RequireAuth>
                   }

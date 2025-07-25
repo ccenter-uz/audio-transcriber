@@ -10,6 +10,7 @@ export interface LoginResponse {
   access_token: string;
   token: string;
   user: {
+    agent_id: string;
     id: string;
     name: string;
     role: 'admin' | 'operator';

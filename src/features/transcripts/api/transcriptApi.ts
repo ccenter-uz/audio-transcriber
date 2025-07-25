@@ -70,6 +70,7 @@ export interface DatasetViewerParams {
   report?: boolean;
   offset?: number;
   limit?: number;
+  ru: boolean; 
 }
 
 export interface User {
@@ -129,6 +130,7 @@ export const transcriptApi = {
     if (params.report !== undefined) queryParams.append('report', params.report.toString());
     if (params.offset !== undefined) queryParams.append('offset', params.offset.toString());
     if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
+    if (params.ru !== undefined) queryParams.append('ru', params.ru.toString());
 
     const response = await axiosInstance.get<DatasetViewerResponse>(
       `/api/v1/dataset_viewer?${queryParams.toString()}`
@@ -141,6 +143,14 @@ export const transcriptApi = {
     if (params.name) queryParams.append('name', params.name);
     if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
     if (params.offset !== undefined) queryParams.append('offset', params.offset.toString());
+
+    const currentUserRole = localStorage.getItem('user-name');
+    if (currentUserRole !== 'admin') {
+      return {
+        count: 0,
+        users: []
+      };
+    }
 
     const response = await axiosInstance.get<UserListResponse>(
       `/api/v1/user/list?${queryParams.toString()}`

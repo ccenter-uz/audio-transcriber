@@ -13,7 +13,8 @@ export const useAuthMutation = () => {
       login(data.access_token);
       localStorage.setItem('user-name', JSON.stringify(data.user.name).replace('"', '').replace('"', '')); // Store user info in localStorage if needed
       localStorage.setItem('user-image', JSON.stringify(data.user.image).replace('"', '').replace('"', '')); // Store user info in localStorage if needed
-
+      localStorage.setItem('user-id', JSON.stringify(data.user.agent_id).replace('"', '').replace('"', '')); // Store user info in localStorage if needed
+      
 
       notification.success({
         message: 'Success',
