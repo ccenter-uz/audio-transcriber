@@ -30,7 +30,9 @@ export const AuthContext = createContext<AuthContextType>({
   token: null,
   isAuthenticated: false,
   login: () => { },
-  logout: () => { },
+  logout: () => { 
+    // Clear all localStorage items 
+   },
 });
 
 // JWT token storage key

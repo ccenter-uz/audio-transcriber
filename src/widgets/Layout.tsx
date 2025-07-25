@@ -20,6 +20,7 @@ const Layout = () => {
 
   const handleLogout = () => {
     logout();
+    localStorage.clear(); // Clear all localStorage items
     navigate("/login");
   };
 
