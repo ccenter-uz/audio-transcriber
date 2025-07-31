@@ -26,6 +26,15 @@ import debounce from "lodash/debounce";
 
 const { Title } = Typography;
 
+const REPORT_TAGS = {
+  BAD_AUDIO: "Eshitib bo‘lmaydigan",
+  FULL_RUSSIAN: "Bo'lak ≥ 80 % ruscha",
+  SILENCE: "2 soniyadan uzun sukunat",
+  MISSING_AUDIO: "Bo‘sh yoki buzilgan fayl",
+  MISSING_TEXT: "Matn yo‘q",
+  OTHER: "Boshqa",
+};
+
 const AudioPlayer = ({
   url,
   className,
@@ -57,6 +66,7 @@ const DatasetViewerPage = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentChunk, setCurrentChunk] = useState<number>();
   const [editSentence, setEditSentence] = useState<string>("");
+  const [reportReason, setReportReason] = useState<string | null>(null);
   const pageSize = 10;
 
   // Get user id and role from localStorage
@@ -97,8 +107,9 @@ const DatasetViewerPage = () => {
     setSelectedSentence(sentence);
     setIsSentenceModalOpen(true);
   };
-  const openEditModal = (sentence: string, currentChunk: number) => {
+  const openEditModal = (sentence: string, currentChunk: number, reportText: string | undefined) => {
     setEditSentence(sentence);
+    setReportReason(reportText || "");
     setCurrentChunk(currentChunk);
     setIsEditModalOpen(true);
   };
@@ -109,8 +120,8 @@ const DatasetViewerPage = () => {
       return;
     }
     await transcriptApi.updateTranscript(currentChunk, {
-      transcribe_text: editSentence,
-      report_text: null, // Clear report text if transcription is provided
+      transcribe_text:  editSentence,
+      report_text: editSentence ? null : reportReason,
     });
     await refetch(); // Refetch audio segments to get updated status
     message.success("Transkript muvaffaqiyatli yangilandi");
@@ -118,6 +129,12 @@ const DatasetViewerPage = () => {
     setEditSentence("");
     setCurrentChunk(undefined);
   };
+
+  useEffect(() => {
+    if (reportReason) {
+      setEditSentence("");
+    }
+  }, [reportReason]);
 
   const columns: TableProps<DatasetViewerItem>["columns"] = [
     {
@@ -165,7 +182,7 @@ const DatasetViewerPage = () => {
                   type="text"
                   icon={<EditFilled className="text-blue-500" />}
                   onClick={() =>
-                    openEditModal(record.text || "", record.chunk_id)
+                    openEditModal(record.text || "", record.chunk_id, record.report_text)
                   }></Button>
               </div>
               <div className="text-gray-500">Next: {record.next_text}</div>
@@ -298,14 +315,26 @@ const DatasetViewerPage = () => {
         </Typography.Paragraph>
       </Modal>
       <Modal
-        title={` Edit Sentence`}
+        title={`Edit or Report`}
         visible={isEditModalOpen}
         onCancel={() => setIsEditModalOpen(false)}
         footer={null}
         width={1000}>
-        <Input
+        <Input.TextArea
+          rows={2}
           value={editSentence}
           onChange={(e) => setEditSentence(e.target.value)}
+        />
+        <hr className="my-4"/>
+        <Select
+          value={reportReason}
+          onChange={setReportReason}
+          placeholder="Select a reason for reporting"
+          options={Object.keys(REPORT_TAGS).map((tag) => ({
+            value: tag,
+            label: `[${tag}] ${REPORT_TAGS[tag as keyof typeof REPORT_TAGS]}`,
+          }))}
+          className="w-full"
         />
         <Button type="primary" className="mt-4" onClick={handleEditSentence}>
           Save Changes
