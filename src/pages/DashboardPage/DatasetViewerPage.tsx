@@ -60,12 +60,14 @@ const DatasetViewerPage = () => {
   const [searchText, setSearchText] = useState<string>("");
   const [showReported, setShowReported] = useState(false);
   const [showRu, setShowRu] = useState(false);
+  const [numIncluded, setNumIncluded] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [isSentenceModalOpen, setIsSentenceModalOpen] = useState(false);
   const [selectedSentence, setSelectedSentence] = useState<string>("");
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [currentChunk, setCurrentChunk] = useState<number>();
   const [editSentence, setEditSentence] = useState<string>("");
+  const [recommendedSentence, setRecommendedSentence] = useState<string>("");
   const [reportReason, setReportReason] = useState<string | null>(null);
   const pageSize = 10;
 
@@ -90,6 +92,7 @@ const DatasetViewerPage = () => {
     user_id: userId || undefined,
     report: showReported,
     ru: showRu,
+    number: numIncluded,
     offset: (currentPage - 1) * pageSize,
     limit: pageSize, 
   }) as {
@@ -107,8 +110,9 @@ const DatasetViewerPage = () => {
     setSelectedSentence(sentence);
     setIsSentenceModalOpen(true);
   };
-  const openEditModal = (sentence: string, currentChunk: number, reportText: string | undefined) => {
+  const openEditModal = (sentence: string, currentChunk: number, reportText: string | undefined, recommendedText: string | undefined) => {
     setEditSentence(sentence);
+    setRecommendedSentence(recommendedText || "");
     setReportReason(reportText || "");
     setCurrentChunk(currentChunk);
     setIsEditModalOpen(true);
@@ -182,7 +186,7 @@ const DatasetViewerPage = () => {
                   type="text"
                   icon={<EditFilled className="text-blue-500" />}
                   onClick={() =>
-                    openEditModal(record.text || "", record.chunk_id, record.report_text)
+                    openEditModal(record.text || "", record.chunk_id, record.report_text, record.transcribe_text_normalized)
                   }></Button>
               </div>
               <div className="text-gray-500">Next: {record.next_text}</div>
@@ -282,6 +286,10 @@ const DatasetViewerPage = () => {
             <span>Show RU Only:</span>
             <Switch checked={showRu} onChange={setShowRu} />
           </Space>
+          <Space>
+            <span>Show Number Included Text:</span>
+            <Switch checked={numIncluded} onChange={setNumIncluded} />
+          </Space>
         </div>
 
         <Table<DatasetViewerItem>
@@ -320,6 +328,14 @@ const DatasetViewerPage = () => {
         onCancel={() => setIsEditModalOpen(false)}
         footer={null}
         width={1000}>
+        {recommendedSentence && (
+          <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded">
+            <strong>Recommended:</strong>
+            <Typography.Paragraph className="mt-2 text-lg">
+              {recommendedSentence}
+            </Typography.Paragraph>
+          </div>
+        )}
         <Input.TextArea
           rows={2}
           value={editSentence}

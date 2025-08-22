@@ -58,6 +58,7 @@ export interface DatasetViewerItem {
   transcriber: string;
   transcriber_id: string;
   minutes_spent: number;
+  transcribe_text_normalized?: string | undefined;
 }
 
 export interface DatasetViewerResponse {
@@ -69,6 +70,7 @@ export interface DatasetViewerParams {
   user_id?: string;
   report?: boolean;
   offset?: number;
+  number?: boolean;
   limit?: number;
   ru: boolean; 
 }
@@ -131,6 +133,7 @@ export const transcriptApi = {
     if (params.offset !== undefined) queryParams.append('offset', params.offset.toString());
     if (params.limit !== undefined) queryParams.append('limit', params.limit.toString());
     if (params.ru !== undefined) queryParams.append('ru', params.ru.toString());
+    if (params.number !== undefined) queryParams.append('number', params.number.toString());
 
     const response = await axiosInstance.get<DatasetViewerResponse>(
       `/api/v1/dataset_viewer?${queryParams.toString()}`
